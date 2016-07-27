@@ -1,5 +1,5 @@
 ## v2
-Blog的另一个版本，使用MySQL作为数据库,持久层使用MyBatis进行重构。
+[Blog](https://github.com/dotdoppler/Blog)的另一个版本，使用MySQL作为数据库,持久层使用MyBatis进行重构。
 
 Another version of Blog, refactoring persistence layer by using [MyBatis](http://www.mybatis.org/mybatis-3/zh/index.html) + MySQL
 
