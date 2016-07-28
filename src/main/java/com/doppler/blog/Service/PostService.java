@@ -84,10 +84,7 @@ public class PostService {
         if (post.getPostFormat() == PostFormat.MARKDOWN)
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         post.setUpdatedAt(DateFormatter.format(new Date()));
-
-//        if(recentPostsRepository.findByPostId(post.getId()) == null)
-//        recentPostsRepository.insert(new RecentPosts(post.getId()));
-//        mongoOperations.save(post);
+        postMapper.updatePost(post);
         logger.info(GlobalConstants.UPDATEPOST.value() + post.getTitle());
     }
     public List<Post> getRecentPosts(){

@@ -4,8 +4,8 @@
 Another version of Blog, refactoring persistence layer by using [MyBatis](http://www.mybatis.org/mybatis-3/zh/index.html) + MySQL
 
 ### Todo List
-* 更新、 删除 Post
-* 添加、删除、更新标签
-* 优化SQL语句，使用mybatis动态SQL
-* 重构，Service层抛异常，Controller层捕获处理异常
-* 数据库命名 小写+下划线 如 post_status
+- [x] 添加、更新、 删除 Post
+- [ ] 添加、删除、更新标签
+- [ ] 优化SQL语句，使用mybatis动态SQL
+- [ ] 重构，Service层抛异常，Controller层捕获处理异常
+- [ ] 数据库命名 小写+下划线 如 post_status

@@ -20,4 +20,5 @@ public interface PostMapper {
     List<Post> getPostsByHashtag(@Param("tagName") String tagName);
     void insertPost(Post post);
     void deletePostById(@Param("postId") String postId);
+    void updatePost(Post post);
 }

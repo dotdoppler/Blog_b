@@ -22,7 +22,7 @@
             postStatus = #{postStatus}
         ORDER BY p.id DESC
     </select>
-    <select id="getPostById" resultType="PostForm" >
+    <select id="getPostById" resultType="Post" >
         SELECT
             *
         FROM
@@ -123,5 +123,17 @@
     WHERE
         id = #{postId}
     </delete>
+    <update id="updatePost" flushCache="true" parameterType="Post">
+        UPDATE post p
+        SET
+        p.title = #{title},
+        p.link = #{link},
+        p.content = #{content},
+        p.renderedContent = #{renderedContent},
+        p.postStatus = #{postStatus},
+        p.postFormat = #{postFormat},
+        p.updatedAt = #{updatedAt}
+        WHERE p.id = #{id}
+    </update>
 
 </mapper>
