@@ -1,6 +1,5 @@
 package com.doppler.blog.Service;
 
-import com.doppler.blog.GlobalConstants;
 import com.doppler.blog.mappers.PostMapper;
 import com.doppler.blog.models.Hashtag;
 import com.doppler.blog.models.Post;
@@ -20,6 +19,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import static com.doppler.blog.GlobalConstants.*;
 
 
 /**
@@ -27,8 +27,7 @@ import java.util.Set;
  */
 @Service
 public class PostService {
-//    @Resource
-//    private PostDao postDao;
+
     @Resource
     private PostMapper postMapper;
     @Resource
@@ -45,7 +44,7 @@ public class PostService {
         }
         post.setCreatedAt(DateFormatter.format(new Date()));
         postMapper.insertPost(post);
-        logger.info(GlobalConstants.INSERTPOST.value() + post.getTitle());
+        logger.info(INSERTPOST.value() + post.getTitle());
         return post;
     }
 
@@ -76,7 +75,7 @@ public class PostService {
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     public void deletePost(String postId){
         postMapper.deletePostById(postId);
-        logger.info(GlobalConstants.DELETEPOST.value() + postId);
+        logger.info(DELETEPOST.value() + postId);
     }
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     @Transactional
@@ -85,7 +84,7 @@ public class PostService {
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         post.setUpdatedAt(DateFormatter.format(new Date()));
         postMapper.updatePost(post);
-        logger.info(GlobalConstants.UPDATEPOST.value() + post.getTitle());
+        logger.info(UPDATEPOST.value() + post.getTitle());
     }
     public List<Post> getRecentPosts(){
        // return postDao.findRecentPosts();

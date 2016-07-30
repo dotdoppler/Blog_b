@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static com.doppler.blog.GlobalConstants.INSERTHASHTAG;
+
 /**
  * Created by doppler on 2016/5/30.
  */
@@ -30,7 +32,7 @@ public class HashtagService {
 //            hashtag = new Hashtag(name);
 //            hashtag.setCreatedAt(DateFormatter.format(new Date()));
 //            hashtagRepository.insert(hashtag);
-//            logger.info(GlobalConstants.INSERTHASHTAG.value());
+            logger.info(INSERTHASHTAG.value());
 //        }
         return hashtag;
     }
@@ -46,6 +48,7 @@ public class HashtagService {
 
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
     public void deleteTag(Long hashtagId) {
+
         hashtagMapper.deleteTagById(hashtagId);
     }
 }
