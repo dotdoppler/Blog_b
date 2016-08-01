@@ -21,4 +21,8 @@ public interface PostMapper {
     void insertPost(Post post);
     void deletePostById(@Param("postId") String postId);
     void updatePost(Post post);
+
+    List<String> getHashtags(@Param("postId") Long postId);
+
+    void deleteTag(@Param("tagId") Long id,@Param("postId") Long postId);
 }

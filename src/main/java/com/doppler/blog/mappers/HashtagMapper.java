@@ -14,4 +14,9 @@ public interface HashtagMapper {
     Hashtag findTagByName(@Param("name") String name);
     List<Hashtag> findAllTags();
     void deleteTagById(@Param("id") Long hashtagId);
+
+    void insertHashTag(Hashtag hashtag);
+
+    void savePostAndTags(@Param("tagId") Long hashtagId,
+                         @Param("id") Long id);
 }

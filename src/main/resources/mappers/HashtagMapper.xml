@@ -3,11 +3,12 @@
 <mapper namespace="com.doppler.blog.mappers.HashtagMapper">
     <select id="findTagByName" resultType="Hashtag">
     SELECT
-        h.name
+        h.name,
+        h.id
     FROM
         hashtag h
     WHERE
-        NAME = #{name}
+        h.name = #{name}
     </select>
     <select id="findAllTags" resultType="Hashtag">
     SELECT
@@ -19,8 +20,18 @@
     <delete id="deleteTagById" flushCache="true">
     DELETE
     FROM
-        hashtag h
+        hashtag
     WHERE
-        h.id = #{id}
+        id = #{id}
     </delete>
+    <insert id="insertHashTag" parameterType="Hashtag" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+        INSERT INTO
+        hashtag(name,createdAt,updatedAt)
+        VALUES (#{name},#{createdAt},#{createdAt})
+    </insert>
+    <insert id="savePostAndTags" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO
+        posts_tags(post_id,tag_id)
+        VALUES (#{id},#{tagId})
+    </insert>
 </mapper>

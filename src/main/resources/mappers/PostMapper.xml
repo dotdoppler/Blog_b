@@ -136,4 +136,19 @@
         WHERE p.id = #{id}
     </update>
 
+    <select id="getHashtags" resultType="java.lang.String">
+        SELECT
+        h.name AS name
+        FROM
+        hashtag h,
+        posts_tags pt
+        WHERE
+         pt.post_id = #{postId}
+        AND
+        h.id = pt.tag_id
+    </select>
+    <update id="deleteTag" parameterType="Long">
+        update posts_tags  SET post_id = NULL ,tag_id = NULL  WHERE post_id = #{postId} AND tag_id = #{tagId}
+    </update>
+
 </mapper>

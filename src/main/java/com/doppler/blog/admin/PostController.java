@@ -6,7 +6,6 @@ import com.doppler.blog.models.Post;
 import com.doppler.blog.models.support.PostFormat;
 import com.doppler.blog.models.support.PostStatus;
 import com.doppler.blog.utils.DTOUtil;
-import com.doppler.blog.utils.DateFormatter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,11 +33,9 @@ public class PostController {
     }
 
     @RequestMapping(value = "",method = RequestMethod.POST)
+
     public String create(@Valid PostForm postForm){
-        Post post = DTOUtil.map(postForm, Post.class);
-        post.setHashtags(postService.parseHashtagStr(postForm.getHashtags()));
-        post.setCreatedAt(DateFormatter.format(new Date()));
-        postService.createPost(post);
+        postService.createPost(postForm);
         return "redirect:/admin/posts";
     }
     @RequestMapping(value = "{postId}",method = RequestMethod.DELETE)
@@ -49,10 +45,8 @@ public class PostController {
     }
     @RequestMapping(value = "{postId}",method = {RequestMethod.POST,RequestMethod.PUT})
     public  String updatePost(@PathVariable Long postId,@Valid PostForm postForm){
-        Post post = postService.getPostById(postId);
-        DTOUtil.mapTo(postForm, post);
-        post.setHashtags(postService.parseHashtagStr(postForm.getHashtags()));
-        postService.updatePost(post);
+
+        postService.updatePost(postId,postForm);
         return  "redirect:/admin/posts";
     }
 
@@ -70,7 +64,7 @@ public class PostController {
     public String editPost(@PathVariable Long postId, Model model){
         Post post = postService.getPostById(postId);
         PostForm postForm = DTOUtil.map(post, PostForm.class);
-        postForm.setHashtags(postService.getHashtags_str(post.getHashtags()));
+        postForm.setHashtags(postService.getHashtags_str(postService.getHashtags(post.getId())));
         model.addAttribute("post", post);
         model.addAttribute("postForm", postForm);
         model.addAttribute("postFormats", PostFormat.values());

@@ -1,10 +1,11 @@
 package com.doppler.blog.Service;
 
+import com.doppler.blog.forms.PostForm;
 import com.doppler.blog.mappers.PostMapper;
-import com.doppler.blog.models.Hashtag;
 import com.doppler.blog.models.Post;
 import com.doppler.blog.models.support.PostFormat;
 import com.doppler.blog.models.support.PostStatus;
+import com.doppler.blog.utils.DTOUtil;
 import com.doppler.blog.utils.DateFormatter;
 import com.doppler.blog.utils.Markdown;
 import org.slf4j.Logger;
@@ -15,10 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static com.doppler.blog.GlobalConstants.*;
 
 
@@ -38,14 +38,21 @@ public class PostService {
 
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     @Transactional
-    public Post createPost(Post post) {
+    public void createPost(PostForm postForm) {
+
+        Post post = DTOUtil.map(postForm, Post.class);
+        post.setCreatedAt(DateFormatter.format(new Date()));
         if (post.getPostFormat() == PostFormat.MARKDOWN) {
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         }
         post.setCreatedAt(DateFormatter.format(new Date()));
         postMapper.insertPost(post);
         logger.info(INSERTPOST.value() + post.getTitle());
-        return post;
+        Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
+        List<Long> hashtagIds = new ArrayList<>();
+        if (tagNames != null)
+            tagNames.forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
+        hashtagIds.forEach(hashtagId -> hashtagService.savePostAndTags(hashtagId,post.getId()));
     }
 
     @Cacheable(value = CACHE_POST_ARCHIVE)
@@ -54,10 +61,6 @@ public class PostService {
         return postMapper.findAllPostsByStatus(PostStatus.PUBLISHED);
     }
 
-//    public Page<Post> getPublishedPostsByPage(int page, int pageSize){
-//        Pageable pageRequest = new PageRequest(page, pageSize, Sort.Direction.DESC, "_id");
-//        return postRepository.findAllPostsByStatusAndPage(PostStatus.PUBLISHED, pageRequest);
-//    }
 
     public Post getPostById(Long postId){
         return  postMapper.getPostById(postId);
@@ -79,33 +82,50 @@ public class PostService {
     }
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     @Transactional
-    public void updatePost(Post post){
+    public void updatePost(Long postId,PostForm postForm){
+        Post post = getPostById(postId);
+        DTOUtil.mapTo(postForm, post);
         if (post.getPostFormat() == PostFormat.MARKDOWN)
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         post.setUpdatedAt(DateFormatter.format(new Date()));
         postMapper.updatePost(post);
         logger.info(UPDATEPOST.value() + post.getTitle());
+        Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
+        List<Long> hashtagIds = new ArrayList<>();
+        List<String> tagsBeforeUpdate = getHashtags(postId);
+       // tagsBeforeUpdate.forEach(before -> tagNames.contains(before));
+        hashtagIds.addAll(tagsBeforeUpdate.stream().filter(s -> !tagNames.contains(s)).
+                map(s -> hashtagService.findOrCreateByName(s).getId()).collect(Collectors.toList()));
+        deleteTagsForPost(hashtagIds,postId);
+        //  hashtagIds.clear();
+        tagNames.stream().filter(s -> !tagsBeforeUpdate.contains(s)).
+                forEach(s -> hashtagService.savePostAndTags(hashtagService.findOrCreateByName(s).getId(), postId));
+//        if (tagNames != null)
+//            tagNames.forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
+
     }
     public List<Post> getRecentPosts(){
        // return postDao.findRecentPosts();
         return postMapper.findAllPostsByStatus(PostStatus.PUBLISHED);
     }
 
-    public Set<Hashtag> parseHashtagStr(String hashtags_str){
-        Set<Hashtag> hashtags = new HashSet<>();
+    public Set<String> parseHashtagStr(String hashtags_str){
         if(hashtags_str != null && !hashtags_str.isEmpty()){
             String names[] = hashtags_str.split("\\s*,\\s*");
-            for(String name : names)
-                hashtags.add(hashtagService.findOrCreateByName(name));
+            Set<String> set = new HashSet<>();
+            for (int i = 0;i < names.length;i++)
+                set.add(names[i]);
+            return set;
         }
-        return hashtags;
+        else
+            return null;
     }
 
-    public String getHashtags_str(Set<Hashtag> hashtags) {
+    public String getHashtags_str(List<String> hashtags) {
         if (hashtags == null || hashtags.isEmpty())
             return "";
         StringBuilder hashtags_str = new StringBuilder("");
-        hashtags.forEach(hashtag -> hashtags_str.append(hashtag.toString()).append(","));
+        hashtags.forEach(hashtag -> hashtags_str.append(hashtag).append(","));
         hashtags_str.deleteCharAt(hashtags_str.length() - 1);
         return hashtags_str.toString();
     }
@@ -113,5 +133,14 @@ public class PostService {
     public List<Post> getPostsByTag(String tagName) {
 
        return postMapper.getPostsByHashtag(tagName);
+    }
+
+    public List<String> getHashtags(Long postId) {
+        return postMapper.getHashtags(postId);
+    }
+
+    @Transactional
+    private void deleteTagsForPost(List<Long> ids,Long postId){
+    ids.forEach(id -> postMapper.deleteTag(id,postId));
     }
 }
