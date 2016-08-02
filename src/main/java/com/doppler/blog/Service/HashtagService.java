@@ -21,8 +21,8 @@ import static com.doppler.blog.GlobalConstants.INSERTHASHTAG;
 @Service
 public class HashtagService {
 
-   @Resource
-   private HashtagMapper hashtagMapper;
+    @Resource
+    private HashtagMapper hashtagMapper;
 
     private static final String CACHE_TAGS = "tags";
 
@@ -40,9 +40,12 @@ public class HashtagService {
         }
         return hashtag;
     }
+
+
     public Hashtag findByName(String tagName){
         return hashtagMapper.findTagByName(tagName);
     }
+
 
     @Cacheable(value = CACHE_TAGS)
     public List<Hashtag> findAll(){
@@ -50,12 +53,15 @@ public class HashtagService {
         return hashtagMapper.findAllTags();
     }
 
+
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
     @Transactional
     public void deleteTag(Long hashtagId) {
 
         hashtagMapper.deleteTagById(hashtagId);
     }
+
+
     @Transactional
     public void savePostAndTags(Long hashtagId, Long postId) {
         hashtagMapper.savePostAndTags(hashtagId,postId);

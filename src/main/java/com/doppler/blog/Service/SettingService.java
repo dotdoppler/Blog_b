@@ -19,6 +19,8 @@ public class SettingService {
     public Setting getSetting(){
         return settingMapper.getSettings();
     }
+
+
     public  Setting updateSetting(Setting setting) {
        logger.info(UPDATESETTINGS.value());
         settingMapper.updateSettings(setting);

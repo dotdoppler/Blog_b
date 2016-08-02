@@ -19,11 +19,14 @@ import javax.annotation.Resource;
 public class PostController {
     @Resource
     PostService postService;
+
     @RequestMapping(value = {"archive",""},method = RequestMethod.GET)
     public String archive(Model model){
         model.addAttribute("posts",  postService.getPublishedPosts());
         return "posts/archive";
     }
+
+
     @RequestMapping(value = "{postLink}",method = RequestMethod.GET)
     public String showPosts(@PathVariable String postLink, Model model){
         Post post = postService.getByLink(postLink);

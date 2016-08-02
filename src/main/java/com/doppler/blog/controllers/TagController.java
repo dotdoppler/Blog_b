@@ -31,6 +31,8 @@ public class TagController {
         model.addAttribute("allHashtags",hashtags);
         return "hashtags/index";
     }
+
+
     @RequestMapping(value = "{tagName}",method = RequestMethod.GET)
         public String showPosts(@PathVariable String tagName,Model model){
         Hashtag hashtag = hashtagService.findByName(tagName);

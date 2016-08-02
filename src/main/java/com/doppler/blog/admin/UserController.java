@@ -14,17 +14,22 @@ import javax.annotation.Resource;
 
 @Controller
 public class UserController {
-@Resource
+    @Resource
     UserService userService;
+
     @RequestMapping(value = "login",method = RequestMethod.GET)
     public String login() {
         return "admin/users/login";
     }
+
+
     @RequestMapping(value = "admin/user/profile",method = RequestMethod.GET)
     public String profile(Model model){
         model.addAttribute("user",userService.getCurrentUser());
         return "admin/users/profile";
     }
+
+
     @RequestMapping(value = "admin/user/{username}",method = RequestMethod.POST)
     public String updatePwd(@PathVariable String username, UserForm userForm,Model model){
         User user = userService.findByUsername(username);

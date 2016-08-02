@@ -9,7 +9,8 @@ public enum GlobalConstants {
     UPDATEPOST("Update a post : "),
     UPDATEPWD("User updated password"),
     UPDATESETTINGS("App info updated"),
-    INSERTHASHTAG("Insert a hashtag : ");
+    INSERTHASHTAG("Insert a hashtag : "),
+    INSERT_POST_FAIL("Insert post failed");
 
     private final String value;
     private GlobalConstants(String value){

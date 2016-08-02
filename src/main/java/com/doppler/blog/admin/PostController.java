@@ -23,8 +23,10 @@ import java.util.List;
 @Controller("adminPostController")
 @RequestMapping("admin/posts")
 public class PostController {
+
     @Resource
     PostService postService;
+
     @RequestMapping(value = "",method = RequestMethod.GET)
     public String index(Model model){
         List<Post> posts = postService.findAllPosts();
@@ -32,17 +34,21 @@ public class PostController {
         return "admin/posts/index";
     }
 
-    @RequestMapping(value = "",method = RequestMethod.POST)
 
+    @RequestMapping(value = "",method = RequestMethod.POST)
     public String create(@Valid PostForm postForm){
         postService.createPost(postForm);
         return "redirect:/admin/posts";
     }
+
+
     @RequestMapping(value = "{postId}",method = RequestMethod.DELETE)
     public @ResponseBody String deletePost(@PathVariable String postId){
         postService.deletePost(postId);
         return null;
     }
+
+
     @RequestMapping(value = "{postId}",method = {RequestMethod.POST,RequestMethod.PUT})
     public  String updatePost(@PathVariable Long postId,@Valid PostForm postForm){
 

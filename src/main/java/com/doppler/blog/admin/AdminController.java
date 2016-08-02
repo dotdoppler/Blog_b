@@ -30,17 +30,22 @@ public class AdminController {
         return "admin/home/index";
     }
 
+
     @RequestMapping(value = "settings",method = RequestMethod.GET)
     public String showSettings(Model model){
         model.addAttribute("settings",settingService.getSetting());
         return "admin/home/settings";
     }
+
+
     @RequestMapping(value = "settings",method = RequestMethod.POST)
     public String updateSettings(@Valid Setting setting, Model model){
        setting = settingService.updateSetting(setting);
         model.addAttribute("settings",setting);
         return "admin/home/settings";
     }
+
+
     @RequestMapping(value = "hashtags",method = RequestMethod.GET)
     public String showTags(Model model){
         model.addAttribute("hashtags",hashtagService.findAll());

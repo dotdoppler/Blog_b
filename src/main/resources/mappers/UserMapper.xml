@@ -3,9 +3,15 @@
 <mapper namespace="com.doppler.blog.mappers.UserMapper">
     <select id="findByUsername" resultType="User" >
         SELECT
-            *
+            u.id,
+            u.created AS createdAt,
+            u.updated AS updatedAt,
+            u.email,
+            u.password,
+            u.role,
+            u.username
         FROM
-            USER
+            user u
         WHERE
             username = #{username}
     </select>

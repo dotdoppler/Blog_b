@@ -1,5 +1,6 @@
 package com.doppler.blog.Service;
 
+import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.forms.PostForm;
 import com.doppler.blog.mappers.PostMapper;
 import com.doppler.blog.models.Post;
@@ -36,9 +37,10 @@ public class PostService {
     private static final String CACHE_POST_ARCHIVE = "post_archive";
     private static final Logger logger = LoggerFactory.getLogger(PostService.class);
 
+
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     @Transactional
-    public void createPost(PostForm postForm) {
+    public void createPost(PostForm postForm) throws CommonException {
 
         Post post = DTOUtil.map(postForm, Post.class);
         post.setCreatedAt(DateFormatter.format(new Date()));
@@ -46,7 +48,9 @@ public class PostService {
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         }
         post.setCreatedAt(DateFormatter.format(new Date()));
-        postMapper.insertPost(post);
+        int count = postMapper.insertPost(post);
+            if(count != 1)
+                throw new CommonException(INSERT_POST_FAIL.value());
         logger.info(INSERTPOST.value() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
@@ -54,6 +58,7 @@ public class PostService {
             tagNames.forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
         hashtagIds.forEach(hashtagId -> hashtagService.savePostAndTags(hashtagId,post.getId()));
     }
+
 
     @Cacheable(value = CACHE_POST_ARCHIVE)
     public List<Post> getPublishedPosts(){
@@ -66,13 +71,17 @@ public class PostService {
         return  postMapper.getPostById(postId);
     }
 
+
     public Post getByLink(String postLink){
         return postMapper.getByLink(postLink);
     }
 
+
     public List<Post> findAllPosts(){
         return postMapper.findAllPosts();
     }
+
+
 
     @Transactional
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
@@ -80,6 +89,8 @@ public class PostService {
         postMapper.deletePostById(postId);
         logger.info(DELETEPOST.value() + postId);
     }
+
+
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     @Transactional
     public void updatePost(Long postId,PostForm postForm){
@@ -93,21 +104,18 @@ public class PostService {
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
         List<String> tagsBeforeUpdate = getHashtags(postId);
-       // tagsBeforeUpdate.forEach(before -> tagNames.contains(before));
         hashtagIds.addAll(tagsBeforeUpdate.stream().filter(s -> !tagNames.contains(s)).
                 map(s -> hashtagService.findOrCreateByName(s).getId()).collect(Collectors.toList()));
         deleteTagsForPost(hashtagIds,postId);
-        //  hashtagIds.clear();
         tagNames.stream().filter(s -> !tagsBeforeUpdate.contains(s)).
                 forEach(s -> hashtagService.savePostAndTags(hashtagService.findOrCreateByName(s).getId(), postId));
-//        if (tagNames != null)
-//            tagNames.forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
+    }
 
-    }
+
     public List<Post> getRecentPosts(){
-       // return postDao.findRecentPosts();
-        return postMapper.findAllPostsByStatus(PostStatus.PUBLISHED);
+        return postMapper.getRecentPosts();
     }
+
 
     public Set<String> parseHashtagStr(String hashtags_str){
         if(hashtags_str != null && !hashtags_str.isEmpty()){
@@ -121,6 +129,7 @@ public class PostService {
             return null;
     }
 
+
     public String getHashtags_str(List<String> hashtags) {
         if (hashtags == null || hashtags.isEmpty())
             return "";
@@ -130,14 +139,17 @@ public class PostService {
         return hashtags_str.toString();
     }
 
+
     public List<Post> getPostsByTag(String tagName) {
 
        return postMapper.getPostsByHashtag(tagName);
     }
 
+
     public List<String> getHashtags(Long postId) {
         return postMapper.getHashtags(postId);
     }
+
 
     @Transactional
     private void deleteTagsForPost(List<Long> ids,Long postId){

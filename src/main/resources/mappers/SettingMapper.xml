@@ -3,14 +3,16 @@
 <mapper namespace="com.doppler.blog.mappers.SettingMapper">
     <select id="getSettings"  resultType="Setting">
        SELECT
-            *
+            s.site_name AS siteName,
+            s.slogan,
+            s.notification
         FROM
-            setting
+            setting s
     </select>
     <update id="updateSettings" flushCache="true" parameterType="Setting">
         UPDATE setting
         SET
-          siteName = #{siteName},
+          site_name = #{siteName},
           slogan = #{slogan},
           notification = #{notification}
         WHERE

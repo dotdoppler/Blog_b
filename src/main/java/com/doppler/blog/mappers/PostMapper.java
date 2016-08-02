@@ -14,15 +14,24 @@ import java.util.List;
 public interface PostMapper {
 
     List<Post> findAllPostsByStatus(@Param("postStatus") PostStatus postStatus);
+
     Post getPostById(@Param("postId") Long postId);
+
     Post getByLink(@Param("postLink") String postLink);
+
     List<Post> findAllPosts();
+
     List<Post> getPostsByHashtag(@Param("tagName") String tagName);
-    void insertPost(Post post);
+
+    int insertPost(Post post);
+
     void deletePostById(@Param("postId") String postId);
+
     void updatePost(Post post);
 
     List<String> getHashtags(@Param("postId") Long postId);
 
     void deleteTag(@Param("tagId") Long id,@Param("postId") Long postId);
+
+    List<Post> getRecentPosts();
 }

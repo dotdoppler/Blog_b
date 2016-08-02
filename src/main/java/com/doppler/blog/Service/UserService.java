@@ -32,6 +32,7 @@ public class UserService implements UserDetailsService {
     Logger logger = LoggerFactory.getLogger(UserService.class);
     @Resource
     UserMapper userMapper;
+
     @Bean
     private PasswordEncoder passwordEncoder(){
         PasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -46,6 +47,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+
     public User getCurrentUser(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth == null || auth instanceof AnonymousAuthenticationToken){
@@ -54,6 +56,8 @@ public class UserService implements UserDetailsService {
         String username = ((org.springframework.security.core.userdetails.User)auth.getPrincipal()).getUsername();
         return userMapper.findByUsername(username);
     }
+
+
     public void changePassword(User user,String password, String newPassword){
 
         if (passwordEncoder().matches(password,user.getPassword())) {
@@ -72,12 +76,15 @@ public class UserService implements UserDetailsService {
 
         return createSpringUser(user);
     }
+
+
     private org.springframework.security.core.userdetails.User createSpringUser(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
                 Collections.singleton(createAuthority(user)));
     }
+
 
     private GrantedAuthority createAuthority(User user) {
         return new SimpleGrantedAuthority(user.getRole());

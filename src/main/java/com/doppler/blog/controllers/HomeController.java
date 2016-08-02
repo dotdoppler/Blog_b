@@ -21,6 +21,7 @@ public class HomeController {
     PostService postService;
     @Resource
     SettingService settingService;
+
     @RequestMapping(value = {"","home"}, method = GET)
     public String index(Model model){
         List<Post> recentPosts = postService.getRecentPosts();
@@ -28,6 +29,8 @@ public class HomeController {
         model.addAttribute("settings", settingService.getSetting());
         return "home/index";
     }
+
+
     @RequestMapping(value = "about")
     public String about(){
         return "home/about";

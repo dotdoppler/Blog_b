@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.doppler.blog.mappers.PostMapper">
-    <select id="findRecentPosts" resultType="Post" >
+    <select id="getRecentPosts" resultType="Post" >
         SELECT
             p.title,
             p.link
@@ -15,16 +15,24 @@
         SELECT
             p.title,
             p.link,
-            p.createdAt
+            p.created AS createdAt
         FROM
             post p
         WHERE
-            postStatus = #{postStatus}
+            p.post_status = #{postStatus}
         ORDER BY p.id DESC
     </select>
     <select id="getPostById" resultType="Post" >
         SELECT
-            *
+            p.id,
+            p.created AS createdAt,
+            p.updated AS updatedAt,
+            p.title,
+            p.link,
+            p.content,
+            p.rendered_content AS renderedContent,
+            p.post_status AS postStatus,
+            p.post_format AS postFormat
         FROM
             post p
         WHERE
@@ -40,26 +48,26 @@
     </select>
     <resultMap id="postResultMap" type="Post">
         <id property="id" column="id"/>
-        <result property="createdAt" column="createdAt"/>
-        <result property="updatedAt" column="updatedAt"/>
+        <result property="createdAt" column="created"/>
+        <result property="updatedAt" column="updated"/>
         <result property="title" column="title"/>
         <result property="link" column="link"/>
         <result property="content" column="content"/>
-        <result property="renderedContent" column="renderedContent"/>
-        <result property="postStatus" column="postStatus"/>
-        <result property="postFormat" column="postFormat"/>
+        <result property="renderedContent" column="rendered_content"/>
+        <result property="postStatus" column="post_status"/>
+        <result property="postFormat" column="post_format"/>
         <collection property="hashtags" javaType="java.util.HashSet" ofType="Hashtag"
                     select="selectTagsForPost" column="id"/>
     </resultMap>
     <select id="findAllPosts" resultType="Post" >
         SELECT
             p.id,
-            p.createdAt,
-            p.updatedAt,
+            p.created AS createdAt,
+            p.updated AS updatedAt,
             p.title,
             p.link,
-            p.postStatus,
-            p.postFormat
+            p.post_status AS postStatus,
+            p.post_format AS postFormat
         FROM
             post p
     </select>
@@ -67,7 +75,7 @@
         SELECT
             p.title,
             p.link,
-            p.createdAt
+            p.created AS createdAt
         FROM
             post p
         WHERE
@@ -83,7 +91,7 @@
                         FROM
                             hashtag
                         WHERE
-                            NAME = #{tagName}))
+                            `name` = #{tagName}))
     </select>
 
     <resultMap id="hashtagsResultMap" type="Hashtag">
@@ -105,16 +113,23 @@
     </select>
     <insert id="insertPost" flushCache="true" parameterType="Post" useGeneratedKeys="true" keyProperty="id">
       INSERT INTO post (
-        createdAt,
-        title,
-        link,
-        content,
-        renderedContent,
-        postStatus,
-        postFormat
+        `created`,
+        `title`,
+        `link`,
+        `content`,
+        `rendered_content`,
+        `post_status`,
+        `post_format`
     )
     VALUES
-        (#{createdAt}, #{title}, #{link}, #{content}, #{renderedContent}, #{postStatus}, #{postFormat})
+        (
+            #{createdAt},
+            #{title},
+            #{link},
+            #{content},
+            #{renderedContent},
+            #{postStatus},
+            #{postFormat})
     </insert>
     <delete id="deletePostById" flushCache="true" >
     DELETE
@@ -129,10 +144,10 @@
         p.title = #{title},
         p.link = #{link},
         p.content = #{content},
-        p.renderedContent = #{renderedContent},
-        p.postStatus = #{postStatus},
-        p.postFormat = #{postFormat},
-        p.updatedAt = #{updatedAt}
+        p.rendered_content = #{renderedContent},
+        p.post_status = #{postStatus},
+        p.post_format = #{postFormat},
+        p.updated = #{updatedAt}
         WHERE p.id = #{id}
     </update>
 
@@ -150,5 +165,6 @@
     <update id="deleteTag" parameterType="Long">
         update posts_tags  SET post_id = NULL ,tag_id = NULL  WHERE post_id = #{postId} AND tag_id = #{tagId}
     </update>
+
 
 </mapper>
