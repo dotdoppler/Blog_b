@@ -1,5 +1,6 @@
 package com.doppler.blog.Service;
 
+import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.exception.NotFoundException;
 import com.doppler.blog.mappers.UserMapper;
 import com.doppler.blog.models.User;
@@ -21,7 +22,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collections;
 
-import static com.doppler.blog.GlobalConstants.UPDATEPWD;
+import static com.doppler.blog.GlobalConstants.UPDATE_PWD;
+import static com.doppler.blog.GlobalConstants.UPDATE_USER_FAIL;
 
 /**
  * Created by doppler on 2016/5/21.
@@ -57,13 +59,13 @@ public class UserService implements UserDetailsService {
         return userMapper.findByUsername(username);
     }
 
-
     public void changePassword(User user,String password, String newPassword){
-
         if (passwordEncoder().matches(password,user.getPassword())) {
             user.setPassword(passwordEncoder().encode(newPassword));
-            userMapper.updateUser(user);
-            logger.info(UPDATEPWD.value());
+           int count = userMapper.updateUser(user);
+            if(count != 1)
+                throw new CommonException(UPDATE_USER_FAIL.value());
+            logger.info(UPDATE_PWD.value());
         }
 
     }

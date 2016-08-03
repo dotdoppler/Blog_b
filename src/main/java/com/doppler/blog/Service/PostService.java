@@ -51,7 +51,7 @@ public class PostService {
         int count = postMapper.insertPost(post);
             if(count != 1)
                 throw new CommonException(INSERT_POST_FAIL.value());
-        logger.info(INSERTPOST.value() + post.getTitle());
+        logger.info(INSERT_POST.value() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
         if (tagNames != null)
@@ -86,8 +86,10 @@ public class PostService {
     @Transactional
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     public void deletePost(String postId){
-        postMapper.deletePostById(postId);
-        logger.info(DELETEPOST.value() + postId);
+       int count = postMapper.deletePostById(postId);
+        if (count != 1)
+            throw new CommonException(DELETE_POST_FAIL.value());
+        logger.info(DELETE_POST.value() + postId);
     }
 
 
@@ -99,8 +101,10 @@ public class PostService {
         if (post.getPostFormat() == PostFormat.MARKDOWN)
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         post.setUpdatedAt(DateFormatter.format(new Date()));
-        postMapper.updatePost(post);
-        logger.info(UPDATEPOST.value() + post.getTitle());
+        int count = postMapper.updatePost(post);
+        if (count != 1)
+            throw new CommonException(UPDATE_POST_FAIL.value());
+        logger.info(UPDATE_POST.value() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
         List<String> tagsBeforeUpdate = getHashtags(postId);

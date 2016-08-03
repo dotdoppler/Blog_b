@@ -13,7 +13,7 @@ import java.util.List;
 public interface HashtagMapper {
     Hashtag findTagByName(@Param("name") String name);
     List<Hashtag> findAllTags();
-    void deleteTagById(@Param("id") Long hashtagId);
+    int deleteTagById(@Param("id") Long hashtagId);
 
     void insertHashTag(Hashtag hashtag);
 

@@ -1,5 +1,6 @@
 package com.doppler.blog.Service;
 
+import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.mappers.HashtagMapper;
 import com.doppler.blog.models.Hashtag;
 import com.doppler.blog.utils.DateFormatter;
@@ -13,7 +14,8 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
-import static com.doppler.blog.GlobalConstants.INSERTHASHTAG;
+import static com.doppler.blog.GlobalConstants.DELETE_TAG_FAIL;
+import static com.doppler.blog.GlobalConstants.INSERT_HASHTAG;
 
 /**
  * Created by doppler on 2016/5/30.
@@ -36,7 +38,7 @@ public class HashtagService {
             hashtag = new Hashtag(name);
            hashtag.setCreatedAt(DateFormatter.format(new Date()));
           hashtagMapper.insertHashTag(hashtag);
-            logger.info(INSERTHASHTAG.value());
+            logger.info(INSERT_HASHTAG.value());
         }
         return hashtag;
     }
@@ -57,8 +59,9 @@ public class HashtagService {
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
     @Transactional
     public void deleteTag(Long hashtagId) {
-
-        hashtagMapper.deleteTagById(hashtagId);
+       int count = hashtagMapper.deleteTagById(hashtagId);
+        if (count != 1)
+            throw new CommonException(DELETE_TAG_FAIL.value());
     }
 
 

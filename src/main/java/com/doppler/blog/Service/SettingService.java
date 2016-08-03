@@ -1,14 +1,17 @@
 package com.doppler.blog.Service;
 
+import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.mappers.SettingMapper;
 import com.doppler.blog.models.Setting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
-import static com.doppler.blog.GlobalConstants.UPDATESETTINGS;
+import static com.doppler.blog.GlobalConstants.UPDATE_SETTINGS;
+import static com.doppler.blog.GlobalConstants.UPDATE_SETTINGS_FAIL;
 
 @Service
 public class SettingService {
@@ -20,10 +23,12 @@ public class SettingService {
         return settingMapper.getSettings();
     }
 
-
-    public  Setting updateSetting(Setting setting) {
-       logger.info(UPDATESETTINGS.value());
-        settingMapper.updateSettings(setting);
+    @Transactional
+    public Setting updateSetting(Setting setting) {
+        int count = settingMapper.updateSettings(setting);
+        if (count != 1)
+            throw new CommonException(UPDATE_SETTINGS_FAIL.value());
+        logger.info(UPDATE_SETTINGS.value());
         return setting;
     }
 

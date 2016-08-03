@@ -9,5 +9,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface SettingMapper {
     Setting getSettings();
-    void updateSettings(Setting setting);
+    int updateSettings(Setting setting);
 }
