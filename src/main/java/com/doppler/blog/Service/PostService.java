@@ -1,6 +1,5 @@
 package com.doppler.blog.Service;
 
-import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.forms.PostForm;
 import com.doppler.blog.mappers.PostMapper;
 import com.doppler.blog.models.Post;
@@ -21,6 +20,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.doppler.blog.GlobalConstants.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 
 /**
@@ -40,7 +41,7 @@ public class PostService {
 
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     @Transactional
-    public void createPost(PostForm postForm) throws CommonException {
+    public void createPost(PostForm postForm){
 
         Post post = DTOUtil.map(postForm, Post.class);
         post.setCreatedAt(DateFormatter.format(new Date()));
@@ -49,13 +50,11 @@ public class PostService {
         }
         post.setCreatedAt(DateFormatter.format(new Date()));
         int count = postMapper.insertPost(post);
-            if(count != 1)
-                throw new CommonException(INSERT_POST_FAIL.value());
+        checkState(count == 1,INSERT_POST_FAIL.value());
         logger.info(INSERT_POST.value() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
-        if (tagNames != null)
-            tagNames.forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
+        checkNotNull(tagNames).forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
         hashtagIds.forEach(hashtagId -> hashtagService.savePostAndTags(hashtagId,post.getId()));
     }
 
@@ -73,7 +72,7 @@ public class PostService {
 
 
     public Post getByLink(String postLink){
-        return postMapper.getByLink(postLink);
+        return checkNotNull(postMapper.getByLink(postLink),"Post Not Found");
     }
 
 
@@ -86,9 +85,7 @@ public class PostService {
     @Transactional
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     public void deletePost(String postId){
-       int count = postMapper.deletePostById(postId);
-        if (count != 1)
-            throw new CommonException(DELETE_POST_FAIL.value());
+        checkState(postMapper.deletePostById(postId) == 1,DELETE_POST_FAIL.value());
         logger.info(DELETE_POST.value() + postId);
     }
 
@@ -102,8 +99,7 @@ public class PostService {
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
         post.setUpdatedAt(DateFormatter.format(new Date()));
         int count = postMapper.updatePost(post);
-        if (count != 1)
-            throw new CommonException(UPDATE_POST_FAIL.value());
+        checkState(count == 1,UPDATE_POST_FAIL.value());
         logger.info(UPDATE_POST.value() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();

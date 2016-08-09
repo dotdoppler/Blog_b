@@ -16,3 +16,5 @@ server:
 mybatis:
   type-aliases-package: com.doppler.blog.models,com.doppler.blog.forms
   mapper-locations: classpath:mappers/*.xml
+ #configuration:
+  #mapUnderscoreToCamelCase : true

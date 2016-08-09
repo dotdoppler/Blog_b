@@ -1,7 +1,5 @@
 package com.doppler.blog.Service;
 
-import com.doppler.blog.exception.CommonException;
-import com.doppler.blog.exception.NotFoundException;
 import com.doppler.blog.mappers.UserMapper;
 import com.doppler.blog.models.User;
 import org.slf4j.Logger;
@@ -24,6 +22,8 @@ import java.util.Collections;
 
 import static com.doppler.blog.GlobalConstants.UPDATE_PWD;
 import static com.doppler.blog.GlobalConstants.UPDATE_USER_FAIL;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Created by doppler on 2016/5/21.
@@ -43,10 +43,7 @@ public class UserService implements UserDetailsService {
 
 
     public User findByUsername(String username){
-        User user = userMapper.findByUsername(username);
-        if (user == null)
-            throw new NotFoundException(username + " Not Found");
-        return user;
+        return checkNotNull(userMapper.findByUsername(username),username + " Not Found");
     }
 
 
@@ -62,9 +59,7 @@ public class UserService implements UserDetailsService {
     public void changePassword(User user,String password, String newPassword){
         if (passwordEncoder().matches(password,user.getPassword())) {
             user.setPassword(passwordEncoder().encode(newPassword));
-           int count = userMapper.updateUser(user);
-            if(count != 1)
-                throw new CommonException(UPDATE_USER_FAIL.value());
+            checkState(userMapper.updateUser(user) == 1,UPDATE_USER_FAIL.value());
             logger.info(UPDATE_PWD.value());
         }
 
@@ -74,8 +69,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userMapper.findByUsername(username);
         if (user == null)
-            throw new UsernameNotFoundException("user not found");
-
+            throw new UsernameNotFoundException("User Not Found");
         return createSpringUser(user);
     }
 

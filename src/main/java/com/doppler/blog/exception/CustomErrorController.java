@@ -19,7 +19,6 @@ public class CustomErrorController implements ErrorController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @RequestMapping(value = PATH)
     public ModelAndView error(HttpServletRequest request, HttpServletResponse response) {
-
         ModelAndView model = new ModelAndView("error/generic_error");
         model.addObject("path", request.getRequestURI());
         model.addObject("status",response.getStatus());

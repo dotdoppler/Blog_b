@@ -2,7 +2,6 @@ package com.doppler.blog.controllers;
 
 import com.doppler.blog.Service.HashtagService;
 import com.doppler.blog.Service.PostService;
-import com.doppler.blog.exception.NotFoundException;
 import com.doppler.blog.models.Hashtag;
 import com.doppler.blog.models.Post;
 import org.springframework.stereotype.Controller;
@@ -36,8 +35,6 @@ public class TagController {
     @RequestMapping(value = "{tagName}",method = RequestMethod.GET)
         public String showPosts(@PathVariable String tagName,Model model){
         Hashtag hashtag = hashtagService.findByName(tagName);
-        if (hashtag == null)
-            throw new  NotFoundException();
         model.addAttribute("hashtag",hashtag.getName());
         List<Post> posts = postService.getPostsByTag(hashtag.getName());
         model.addAttribute("posts",posts);

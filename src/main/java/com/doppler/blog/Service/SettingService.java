@@ -1,8 +1,8 @@
 package com.doppler.blog.Service;
 
-import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.mappers.SettingMapper;
 import com.doppler.blog.models.Setting;
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,11 +26,9 @@ public class SettingService {
     @Transactional
     public Setting updateSetting(Setting setting) {
         int count = settingMapper.updateSettings(setting);
-        if (count != 1)
-            throw new CommonException(UPDATE_SETTINGS_FAIL.value());
+        Preconditions.checkState(count == 1,UPDATE_SETTINGS_FAIL.value());
         logger.info(UPDATE_SETTINGS.value());
         return setting;
     }
-
 
 }

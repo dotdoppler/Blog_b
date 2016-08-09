@@ -1,6 +1,5 @@
 package com.doppler.blog.Service;
 
-import com.doppler.blog.exception.CommonException;
 import com.doppler.blog.mappers.HashtagMapper;
 import com.doppler.blog.models.Hashtag;
 import com.doppler.blog.utils.DateFormatter;
@@ -16,6 +15,8 @@ import java.util.List;
 
 import static com.doppler.blog.GlobalConstants.DELETE_TAG_FAIL;
 import static com.doppler.blog.GlobalConstants.INSERT_HASHTAG;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Created by doppler on 2016/5/30.
@@ -45,7 +46,7 @@ public class HashtagService {
 
 
     public Hashtag findByName(String tagName){
-        return hashtagMapper.findTagByName(tagName);
+        return checkNotNull(hashtagMapper.findTagByName(tagName),"Not Found");
     }
 
 
@@ -58,10 +59,8 @@ public class HashtagService {
 
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
     @Transactional
-    public void deleteTag(Long hashtagId) {
-       int count = hashtagMapper.deleteTagById(hashtagId);
-        if (count != 1)
-            throw new CommonException(DELETE_TAG_FAIL.value());
+    public void deleteTag(Long hashtagId){
+        checkState(hashtagMapper.deleteTagById(hashtagId) == 1,DELETE_TAG_FAIL.value());
     }
 
 
