@@ -95,8 +95,9 @@ public class PostService {
     public void updatePost(Long postId,PostForm postForm){
         Post post = getPostById(postId);
         DTOUtil.mapTo(postForm, post);
-        if (post.getPostFormat() == PostFormat.MARKDOWN)
+        if (post.getPostFormat() == PostFormat.MARKDOWN) {
             post.setRenderedContent(Markdown.markdownToHtml(post.getContent()));
+        }
         post.setUpdatedAt(DateFormatter.format(new Date()));
         int count = postMapper.updatePost(post);
         checkState(count == 1,UPDATE_POST_FAIL.value());
@@ -131,8 +132,9 @@ public class PostService {
 
 
     public String getHashtags_str(List<String> hashtags) {
-        if (hashtags == null || hashtags.isEmpty())
+        if (hashtags == null || hashtags.isEmpty()) {
             return "";
+        }
         StringBuilder hashtags_str = new StringBuilder("");
         hashtags.forEach(hashtag -> hashtags_str.append(hashtag).append(","));
         hashtags_str.deleteCharAt(hashtags_str.length() - 1);
