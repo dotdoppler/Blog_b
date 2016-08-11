@@ -6,7 +6,6 @@ import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -23,7 +22,6 @@ public class SettingService {
         return settingMapper.getSettings();
     }
 
-    @Transactional
     public Setting updateSetting(Setting setting) {
         int count = settingMapper.updateSettings(setting);
         Preconditions.checkState(count == 1,UPDATE_SETTINGS_FAIL.value());

@@ -82,7 +82,6 @@ public class PostService {
 
 
 
-    @Transactional
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     public void deletePost(String postId){
         checkState(postMapper.deletePostById(postId) == 1,DELETE_POST_FAIL.value());
@@ -153,7 +152,6 @@ public class PostService {
     }
 
 
-    @Transactional
     private void deleteTagsForPost(List<Long> ids,Long postId){
     ids.forEach(id -> postMapper.deleteTag(id,postId));
     }

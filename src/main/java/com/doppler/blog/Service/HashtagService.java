@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -32,13 +31,12 @@ public class HashtagService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(HashtagService.class);
 
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
-    @Transactional
     public Hashtag findOrCreateByName(String name){
         Hashtag hashtag = hashtagMapper.findTagByName(name);
-        if(hashtag == null || hashtag.getName().isEmpty()) {
+        if(hashtag == null || hashtag.getName().isEmpty()){
             hashtag = new Hashtag(name);
-           hashtag.setCreatedAt(DateFormatter.format(new Date()));
-          hashtagMapper.insertHashTag(hashtag);
+            hashtag.setCreatedAt(DateFormatter.format(new Date()));
+            hashtagMapper.insertHashTag(hashtag);
             logger.info(INSERT_HASHTAG.value());
         }
         return hashtag;
@@ -58,13 +56,11 @@ public class HashtagService {
 
 
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
-    @Transactional
     public void deleteTag(Long hashtagId){
         checkState(hashtagMapper.deleteTagById(hashtagId) == 1,DELETE_TAG_FAIL.value());
     }
 
 
-    @Transactional
     public void savePostAndTags(Long hashtagId, Long postId) {
         hashtagMapper.savePostAndTags(hashtagId,postId);
     }
