@@ -6,9 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * Created by doppler on 2016/5/24.
@@ -19,14 +20,14 @@ public class PostController {
     @Resource
     PostService postService;
 
-    @RequestMapping(value = {"archive",""},method = RequestMethod.GET)
+    @RequestMapping(value = {"archive",""},method = GET)
     public String archive(Model model){
         model.addAttribute("posts",  postService.getPublishedPosts());
         return "posts/archive";
     }
 
 
-    @RequestMapping(value = "{postLink}",method = RequestMethod.GET)
+    @RequestMapping(value = "{postLink}",method = GET)
     public String showPosts(@PathVariable String postLink, Model model){
         Post post = postService.getByLink(postLink);
         model.addAttribute("post",post);

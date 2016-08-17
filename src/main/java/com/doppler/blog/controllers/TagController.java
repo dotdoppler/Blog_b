@@ -8,10 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * Created by doppler on 2016/5/31.
@@ -24,7 +25,7 @@ public class TagController {
     @Resource
     private PostService postService;
 
-    @RequestMapping(value = "all",method = RequestMethod.GET)
+    @RequestMapping(value = "all",method = GET)
     public String AllTag(Model model){
         List<Hashtag> hashtags = hashtagService.findAll();
         model.addAttribute("allHashtags",hashtags);
@@ -32,7 +33,7 @@ public class TagController {
     }
 
 
-    @RequestMapping(value = "{tagName}",method = RequestMethod.GET)
+    @RequestMapping(value = "{tagName}",method = GET)
         public String showPosts(@PathVariable String tagName,Model model){
         Hashtag hashtag = hashtagService.findByName(tagName);
         model.addAttribute("hashtag",hashtag.getName());

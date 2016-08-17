@@ -10,12 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
  * Created by doppler on 2016/5/22.
@@ -27,7 +28,7 @@ public class PostController {
     @Resource
     PostService postService;
 
-    @RequestMapping(value = "",method = RequestMethod.GET)
+    @RequestMapping(value = "",method = GET)
     public String index(Model model){
         List<Post> posts = postService.findAllPosts();
         model.addAttribute("posts",posts);
@@ -35,28 +36,28 @@ public class PostController {
     }
 
 
-    @RequestMapping(value = "",method = RequestMethod.POST)
+    @RequestMapping(value = "",method = POST)
     public String create(@Valid PostForm postForm){
         postService.createPost(postForm);
         return "redirect:/admin/posts";
     }
 
 
-    @RequestMapping(value = "{postId}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "{postId}",method = DELETE)
     public @ResponseBody String deletePost(@PathVariable String postId){
         postService.deletePost(postId);
         return null;
     }
 
 
-    @RequestMapping(value = "{postId}",method = {RequestMethod.POST,RequestMethod.PUT})
+    @RequestMapping(value = "{postId}",method = {POST, PUT})
     public  String updatePost(@PathVariable Long postId,@Valid PostForm postForm){
 
         postService.updatePost(postId,postForm);
         return  "redirect:/admin/posts";
     }
 
-    @RequestMapping(value = "new",method = RequestMethod.GET)
+    @RequestMapping(value = "new",method = GET)
     public String newPost(Model model){
         PostForm postForm = DTOUtil.map(new Post(), PostForm.class);
         postForm.setHashtags("");
@@ -66,7 +67,7 @@ public class PostController {
         return "admin/posts/new";
     }
 
-    @RequestMapping(value = "{postId}/edit")
+    @RequestMapping(value = "{postId}/edit",method = GET)
     public String editPost(@PathVariable Long postId, Model model){
         Post post = postService.getPostById(postId);
         PostForm postForm = DTOUtil.map(post, PostForm.class);
