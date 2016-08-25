@@ -37,7 +37,7 @@ public class HashtagService {
             hashtag = new Hashtag(name);
             hashtag.setCreatedAt(DateFormatter.format(new Date()));
             hashtagMapper.insertHashTag(hashtag);
-            logger.info(INSERT_HASHTAG.value());
+            logger.info(INSERT_HASHTAG.val());
         }
         return hashtag;
     }
@@ -57,7 +57,7 @@ public class HashtagService {
 
     @CacheEvict(value = CACHE_TAGS, allEntries = true)
     public void deleteTag(Long hashtagId){
-        checkState(hashtagMapper.deleteTagById(hashtagId) == 1,DELETE_TAG_FAIL.value());
+        checkState(hashtagMapper.deleteTagById(hashtagId) == 1,DELETE_TAG_FAIL.val());
     }
 
 

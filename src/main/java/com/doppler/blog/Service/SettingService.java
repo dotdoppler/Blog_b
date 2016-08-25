@@ -24,8 +24,8 @@ public class SettingService {
 
     public Setting updateSetting(Setting setting) {
         int count = settingMapper.updateSettings(setting);
-        Preconditions.checkState(count == 1,UPDATE_SETTINGS_FAIL.value());
-        logger.info(UPDATE_SETTINGS.value());
+        Preconditions.checkState(count == 1,UPDATE_SETTINGS_FAIL.val());
+        logger.info(UPDATE_SETTINGS.val());
         return setting;
     }
 

@@ -1,5 +1,6 @@
 package com.doppler.blog.Service;
 
+import com.doppler.blog.cache.RedisDao;
 import com.doppler.blog.forms.PostForm;
 import com.doppler.blog.mappers.PostMapper;
 import com.doppler.blog.models.Post;
@@ -33,7 +34,9 @@ public class PostService {
     @Resource
     private PostMapper postMapper;
     @Resource
-    HashtagService hashtagService;
+    private HashtagService hashtagService;
+    @Resource
+    private RedisDao redisDao;
 
     private static final String CACHE_POST_ARCHIVE = "post_archive";
     private static final Logger logger = LoggerFactory.getLogger(PostService.class);
@@ -50,8 +53,8 @@ public class PostService {
         }
         post.setCreatedAt(DateFormatter.format(new Date()));
         int count = postMapper.insertPost(post);
-        checkState(count == 1,INSERT_POST_FAIL.value());
-        logger.info(INSERT_POST.value() + post.getTitle());
+        checkState(count == 1,INSERT_POST_FAIL.val());
+        logger.info(INSERT_POST.val() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
         checkNotNull(tagNames).forEach(name -> hashtagIds.add(hashtagService.findOrCreateByName(name).getId()));
@@ -61,8 +64,16 @@ public class PostService {
 
     @Cacheable(value = CACHE_POST_ARCHIVE)
     public List<Post> getPublishedPosts(){
-        logger.info("not cache,get post archive form db");
-        return postMapper.findAllPostsByStatus(PostStatus.PUBLISHED);
+        try {
+            return checkNotNull(redisDao.getPostArchives(),CACHE_MSG_NULL.val());
+        }catch (NullPointerException ex){
+            logger.info(ex.getMessage());
+        }
+
+        List<Post> posts = postMapper.findAllPostsByStatus(PostStatus.PUBLISHED);
+        redisDao.putPostArchives(posts);
+        logger.info(CACHE_MSG_FROM_DB.val());
+        return posts;
     }
 
 
@@ -84,8 +95,8 @@ public class PostService {
 
     @CacheEvict(value = CACHE_POST_ARCHIVE, allEntries = true)
     public void deletePost(String postId){
-        checkState(postMapper.deletePostById(postId) == 1,DELETE_POST_FAIL.value());
-        logger.info(DELETE_POST.value() + postId);
+        checkState(postMapper.deletePostById(postId) == 1,DELETE_POST_FAIL.val());
+        logger.info(DELETE_POST.val() + postId);
     }
 
 
@@ -99,8 +110,8 @@ public class PostService {
         }
         post.setUpdatedAt(DateFormatter.format(new Date()));
         int count = postMapper.updatePost(post);
-        checkState(count == 1,UPDATE_POST_FAIL.value());
-        logger.info(UPDATE_POST.value() + post.getTitle());
+        checkState(count == 1,UPDATE_POST_FAIL.val());
+        logger.info(UPDATE_POST.val() + post.getTitle());
         Set<String> tagNames = parseHashtagStr(postForm.getHashtags());
         List<Long> hashtagIds = new ArrayList<>();
         List<String> tagsBeforeUpdate = getHashtags(postId);

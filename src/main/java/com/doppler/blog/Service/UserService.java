@@ -59,8 +59,8 @@ public class UserService implements UserDetailsService {
     public void changePassword(User user,String password, String newPassword){
         if (passwordEncoder().matches(password,user.getPassword())) {
             user.setPassword(passwordEncoder().encode(newPassword));
-            checkState(userMapper.updateUser(user) == 1,UPDATE_USER_FAIL.value());
-            logger.info(UPDATE_PWD.value());
+            checkState(userMapper.updateUser(user) == 1,UPDATE_USER_FAIL.val());
+            logger.info(UPDATE_PWD.val());
         }
 
     }

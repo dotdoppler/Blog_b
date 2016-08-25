@@ -15,13 +15,17 @@ public enum GlobalConstants {
     UPDATE_SETTINGS_FAIL("Update settings failed"),
     DELETE_TAG_FAIL("Delete tag failed"),
     DELETE_POST_FAIL("Delete post failed"),
-    UPDATE_POST_FAIL("Update post failed");
+    UPDATE_POST_FAIL("Update post failed"),
+    CACHE_MSG_NULL("Cache is NULL"),
+    CACHE_MSG_FROM_DB("Get data from database"),
+    CACHE_MSG_FROM_REDIS("Get data from redis"),
+    CACHE_KEY_POST_ARCHIVE("key_post_archive");
 
     private final String value;
-    private GlobalConstants(String value){
+    GlobalConstants(String value){
         this.value = value;
     }
-    public String value(){
+    public String val(){
         return this.value;
     };
 }

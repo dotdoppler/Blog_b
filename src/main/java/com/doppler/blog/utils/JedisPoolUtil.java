@@ -15,16 +15,15 @@ public class JedisPoolUtil {
     private JedisPoolUtil(){}
 
     /**
-     * 单例模式, 获取连接池
+     * Singleton, get pool
      * @return
      */
     public static JedisPool getJedisPoolInstance(){
         if (jedisPool == null) {
             synchronized (JedisPoolUtil.class) {
                 if (jedisPool == null) {
-                    //连接池配置
                     JedisPoolConfig poolConfig = new JedisPoolConfig();
-                    poolConfig.setMaxTotal(1000);    //最大实例连接数
+                    poolConfig.setMaxTotal(1000);
                     poolConfig.setMaxIdle(32);
                     poolConfig.setMaxWaitMillis(100 * 1000);
                     poolConfig.setTestOnBorrow(true);
@@ -38,14 +37,11 @@ public class JedisPoolUtil {
     }
 
     /**
-     * 资源返回连接池
-     * @param jedisPool
      * @param jedis
      */
-    public static void returnResource(JedisPool jedisPool ,Jedis jedis){
+    public static void returnResource(Jedis jedis){
         if (jedis != null) {
-            System.out.println("关闭连接池");
-            jedisPool.close();
+            jedis.close();
         }
     }
 }
